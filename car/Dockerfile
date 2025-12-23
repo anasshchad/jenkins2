@@ -1,11 +1,12 @@
-FROM maven:3.8.4-openjdk-17 AS builder
+# Étape 1 : build
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /app
-COPY ./pom.xml ./
-COPY ./src ./src
+COPY pom.xml .
+COPY src ./src
 RUN mvn clean package -DskipTests
 
+# Étape 2 : runtime
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-ARG JAR_FILE=target/*.jar
-COPY --from=builder /app/${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY --from=builder /app/target/*.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]

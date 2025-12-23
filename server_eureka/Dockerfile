@@ -1,12 +1,12 @@
-# Étape 1 : Utilisation de Maven pour construire le fichier JAR
-FROM maven:3.8.4-openjdk-17 AS builder
+# Étape 1 : build
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 WORKDIR /app
-COPY ./pom.xml ./
-COPY ./src ./src
+COPY pom.xml .
+COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Étape 2 : Création de l'image finale avec OpenJDK
+# Étape 2 : runtime
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=builder /app/target/*.jar eureka-server.jar
-ENTRYPOINT ["java", "-jar", "/app/eureka-server.jar"]
+COPY --from=builder /app/target/*.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
